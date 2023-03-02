@@ -30,10 +30,10 @@ import com.example.melodymetricscompose.SongViewModel
 import com.example.melodymetricscompose.db.Song
 
 @Composable
-fun currentlyPlayingCard(viewModel: SongViewModel){
+fun CurrentlyPlayingCard(viewModel: SongViewModel){
 
     val lastPlayedSongsList by viewModel.songs.observeAsState()
-    val lastPlayedSong: Song? = lastPlayedSongsList?.firstOrNull()
+    val lastPlayedSong: Song? = lastPlayedSongsList?.lastOrNull()
 
     if (lastPlayedSong != null) {
         Card(song = lastPlayedSong)

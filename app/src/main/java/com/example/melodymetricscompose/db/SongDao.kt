@@ -16,6 +16,7 @@ interface SongDao {
     @Query("SELECT * FROM song_database")
     fun getAllSongs(): LiveData<List<Song>>
 
-    @Query("SELECT * FROM song_database WHERE song_id = (SELECT MAX(song_id) FROM song_database)")
+    //@Query("SELECT * FROM song_database WHERE song_id = (SELECT MAX(song_id) FROM song_database)")
+    @Query("SELECT * FROM song_database ORDER BY song_id DESC LIMIT 1")
     fun getLastPlayedSong(): LiveData<Song>
 }

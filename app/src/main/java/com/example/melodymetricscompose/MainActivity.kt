@@ -25,7 +25,8 @@ import com.example.melodymetricscompose.mediareaders.TrackChangedEvent
 import com.example.melodymetricscompose.scrapers.RYMRatingFetcher
 import com.example.melodymetricscompose.ui.elements.Card
 import com.example.melodymetricscompose.ui.elements.SongList
-import com.example.melodymetricscompose.ui.elements.currentlyPlayingCard
+import com.example.melodymetricscompose.ui.elements.CurrentlyPlayingCard
+import com.example.melodymetricscompose.ui.elements.Navigation
 import com.example.melodymetricscompose.ui.theme.MelodyMetricsComposeTheme
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -68,12 +69,14 @@ class MainActivity : ComponentActivity() {
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 32.dp), //TODO paddings a spacers -> Detailne prostudovat, je to ugly rn
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val navController = rememberNavController()
+
                     Column {
                         Box(modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.3f)
                             .padding(top = 16.dp)){
-                            currentlyPlayingCard(viewModel)
+                            CurrentlyPlayingCard(viewModel)
                         }
                         SongList(viewModel)
                     }
