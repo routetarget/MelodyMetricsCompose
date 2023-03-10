@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.melodymetricscompose.db.Song
 import com.example.melodymetricscompose.db.SongDatabase
 import com.example.melodymetricscompose.mediareaders.MediaBroadcastReceiver
