@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -16,30 +15,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.melodymetricscompose.SongViewModel
 
 @Composable
-fun Navigation(navController: NavHostController){
-    NavHost(navController = navController, startDestination = "home"){
+fun Navigation(navController: NavHostController, viewModel: SongViewModel){
+    NavHost(navController = navController, startDestination = "mainScreen"){
         composable("mainScreen"){
-            home(name = "home screen")
+            Home(name = "home screen", viewModel = viewModel)
         }
         composable("history"){
-            ChartScreen(name = "Chart Chart")
+            HistoryScreen(name = "History", viewModel = viewModel)
         }
         composable("settings"){
             SettingsScreen(name = "SettingsScreen")
         }
 
-
-
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavBar(
     items: List<BottomNavItem>,
@@ -69,7 +68,7 @@ fun BottomNavBar(
 }
 
 @Composable
-fun home(name: String, modifier: Modifier = Modifier) {
+fun Home(name: String, modifier: Modifier = Modifier, viewModel: SongViewModel) {
     Column {
         Box(
             modifier = Modifier
@@ -79,13 +78,22 @@ fun home(name: String, modifier: Modifier = Modifier) {
         ) {
             CurrentlyPlayingCard(viewModel)
         }
+        BarChartCardDynamic()
     }
 }
 
 @Composable
-fun ChartScreen(name: String, modifier: Modifier = Modifier) {
-    BarChartCard()
-    BarChartCardDynamic()
+fun HistoryScreen(name: String, modifier: Modifier = Modifier, viewModel: SongViewModel) {
+    Column {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.3f)
+                .padding(top = 16.dp)
+        ) {
+        }
+        SongList(viewModel = viewModel)
+    }
 }
 
 
