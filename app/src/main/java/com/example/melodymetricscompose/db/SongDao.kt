@@ -19,4 +19,8 @@ interface SongDao {
     //@Query("SELECT * FROM song_database WHERE song_id = (SELECT MAX(song_id) FROM song_database)")
     @Query("SELECT * FROM song_database ORDER BY song_id DESC LIMIT 1")
     fun getLastPlayedSong(): LiveData<Song>
+
+    // Select data for charting
+    @Query("SELECT * FROM song_database WHERE strftime('%s', 'now') - strftime('%s', song_context) <= :days * 86400")
+    fun getSongsInLastNDays(days: Int): LiveData<List<Song>>
 }

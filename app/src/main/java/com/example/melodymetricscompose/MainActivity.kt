@@ -6,11 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -21,11 +17,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.melodymetricscompose.db.Song
 import com.example.melodymetricscompose.db.SongDatabase
@@ -34,9 +28,6 @@ import com.example.melodymetricscompose.mediareaders.TrackChangedEvent
 import com.example.melodymetricscompose.scrapers.RYMRatingFetcher
 import com.example.melodymetricscompose.ui.elements.BottomNavBar
 import com.example.melodymetricscompose.ui.elements.BottomNavItem
-import com.example.melodymetricscompose.ui.elements.Card
-import com.example.melodymetricscompose.ui.elements.SongList
-import com.example.melodymetricscompose.ui.elements.CurrentlyPlayingCard
 import com.example.melodymetricscompose.ui.elements.Navigation
 import com.example.melodymetricscompose.ui.theme.MelodyMetricsComposeTheme
 import kotlinx.coroutines.launch
@@ -83,6 +74,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+                    viewModel.fetchLastFiveDaysData(dao.getSongsInLastNDays(5))
                     Scaffold(
                         bottomBar = { BottomNavBar(items = listOf(
                                 BottomNavItem(
@@ -125,6 +117,7 @@ class MainActivity : ComponentActivity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTrackChanged(event: TrackChangedEvent) {
         val timestamp: Long = System.currentTimeMillis() // Timestamp je Primary Key -> stejny song, jiny cas == 2 database entries
+        //val dateCreated:
         Log.d("BROADCAST","ALBUM: ${event.album}, TITLE: ${event.title}")
         lifecycleScope.launch{
             val scrapedInfo = RYMRatingFetcher.fetchRating(event.artist, event.album)

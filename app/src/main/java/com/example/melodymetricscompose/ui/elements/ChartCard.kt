@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.melodymetricscompose.SongViewModel
+import com.example.melodymetricscompose.db.Song
 import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.startAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -23,8 +25,8 @@ import com.patrykandpatrick.vico.views.chart.column.columnChart
 import kotlin.random.Random
 
 @Composable
-fun BarChartCardDynamic() {
-    val chartEntryModelProducer = ChartEntryModelProducer(getRandomEntries())
+fun BarChartCardDynamic(viewModel: SongViewModel) {
+    //val chartEntryModelProducer = ChartEntryModelProducer(getRandomEntries())
     androidx.compose.material3.Card(
         modifier = Modifier
             .padding(16.dp)
@@ -49,7 +51,7 @@ fun BarChartCardDynamic() {
                 val context = LocalContext.current
                 Chart(
                     chart = columnChart(context),
-                    chartModelProducer = chartEntryModelProducer,
+                    chartModelProducer = viewModel.chartEntryModelProducer,
                     startAxis = startAxis(),
                     bottomAxis = bottomAxis(),
                 )
@@ -61,5 +63,20 @@ fun BarChartCardDynamic() {
 
 //fun getRandomEntries() = List(4) { FloatEntry(it.toFloat(), (0f..16f).random()) }
 fun getRandomEntries() = List(4) { FloatEntry(it.toFloat(), Random.nextFloat() * 16) }
+
+// TODO move this function somewhere more appropriate
+fun calculateAverageWeightedRating(songs: List<Song>): Float {
+    var sumRatings = 0.0
+    var countRatings = 0
+
+    for (song in songs) {
+        song.songRating?.let {
+            sumRatings += it
+            countRatings++
+        }
+    }
+
+    return if (countRatings > 0) (sumRatings / countRatings).toFloat() else 0f
+}
 
 
