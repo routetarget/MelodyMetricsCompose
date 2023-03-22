@@ -37,7 +37,7 @@ fun BarChartCardDynamic(viewModel: SongViewModel) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "Bar Chart",
+                text = "Rating history",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )

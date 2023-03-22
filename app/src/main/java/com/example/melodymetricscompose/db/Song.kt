@@ -3,6 +3,7 @@ package com.example.melodymetricscompose.db
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDate
 
 @Entity(tableName = "song_database")
 data class Song(
@@ -16,6 +17,8 @@ data class Song(
     @ColumnInfo(name = "song_rating")
     var songRating: Double?,
     @ColumnInfo(name = "song_rym_link")
-    var rymLink: String?
+    var rymLink: String?,
+    @ColumnInfo(name = "date_created")
+    var dateCreated: LocalDate?
 )
 

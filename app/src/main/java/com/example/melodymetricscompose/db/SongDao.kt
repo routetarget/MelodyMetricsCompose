@@ -21,6 +21,12 @@ interface SongDao {
     fun getLastPlayedSong(): LiveData<Song>
 
     // Select data for charting
+    /*
     @Query("SELECT * FROM song_database WHERE strftime('%s', 'now') - strftime('%s', song_context) <= :days * 86400")
     fun getSongsInLastNDays(days: Int): LiveData<List<Song>>
+*/
+
+    @Query("SELECT * FROM song_database WHERE julianday('now') - julianday(date_created) <= :days")
+    fun getSongsInLastNDays(days: Int): LiveData<List<Song>>
+
 }

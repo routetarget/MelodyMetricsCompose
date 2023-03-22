@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
 
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    viewModel.fetchLastFiveDaysData(dao.getSongsInLastNDays(5))
+                    viewModel.fetchLastNDaysSongData(dao.getSongsInLastNDays(5))
                     Scaffold(
                         bottomBar = { BottomNavBar(items = listOf(
                                 BottomNavItem(
@@ -114,18 +115,19 @@ class MainActivity : ComponentActivity() {
     // TODO Every time main activity is restarted, scraper runs again -- check that
     // TODO app is fetched every time on start
     // TODO nekolik tracku za sebou
+    // TODO lepsi timestamp --> lepsi id at to dava vetsi smysl
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTrackChanged(event: TrackChangedEvent) {
         val timestamp: Long = System.currentTimeMillis() // Timestamp je Primary Key -> stejny song, jiny cas == 2 database entries
-        //val dateCreated:
+        val currentDate = LocalDate.now()
         Log.d("BROADCAST","ALBUM: ${event.album}, TITLE: ${event.title}")
         lifecycleScope.launch{
             val scrapedInfo = RYMRatingFetcher.fetchRating(event.artist, event.album)
             if (scrapedInfo.rating != null){
-                viewModel.insertSong(Song(timestamp, event.title, event.album, scrapedInfo.rating, scrapedInfo.url)) //TODO pass RYM link
+                viewModel.insertSong(Song(timestamp, event.title, event.album, scrapedInfo.rating, scrapedInfo.url, currentDate)) //TODO pass RYM link
                 Log.d("FETCHED","Albums ${event.album} rating is: $scrapedInfo.rating")
             } else {
-                viewModel.insertSong(Song(timestamp, event.title, event.album, null, null))
+                viewModel.insertSong(Song(timestamp, event.title, event.album, null, null, currentDate))
                 Log.d("FETCHED","Album rating NOT FETCHED")
             }
 
