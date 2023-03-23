@@ -66,10 +66,10 @@ fun getRandomEntries() = List(4) { FloatEntry(it.toFloat(), Random.nextFloat() *
 
 // TODO move this function somewhere more appropriate
 fun calculateAverageWeightedRating(songs: List<Song>): Float {
-    var sumRatings = 0.0
-    var countRatings = 0
+    var sumRatings = 6.0//0.0
+    var countRatings = 2.0 //0
 
-    for (song in songs) {
+    songs.forEach { song ->
         song.songRating?.let {
             sumRatings += it
             countRatings++
