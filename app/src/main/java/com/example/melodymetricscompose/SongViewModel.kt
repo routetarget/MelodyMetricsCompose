@@ -47,6 +47,10 @@ class SongViewModel(private val dao: SongDao): ViewModel() {
         } as MutableLiveData<List<ChartEntry>>
     }
 
+    suspend fun getAverageRatingLastNDays(days: Int): Double? {
+        return dao.getAverageRatingLastNDays(days)
+    }
+
 }
 
 
