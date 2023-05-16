@@ -78,7 +78,8 @@ fun Home(name: String, modifier: Modifier = Modifier, viewModel: SongViewModel) 
         ) {
             CurrentlyPlayingCard(viewModel)
         }
-        BarChartCardDynamic(viewModel)
+        StatsCard(viewModel)
+        //BarChartCardDynamic(viewModel)
     }
 }
 

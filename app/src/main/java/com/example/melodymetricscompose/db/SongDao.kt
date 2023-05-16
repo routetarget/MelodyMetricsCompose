@@ -26,7 +26,7 @@ interface SongDao {
     fun getSongsInLastNDays(days: Int): LiveData<List<Song>>
 */
 
-    @Query("SELECT * FROM song_database WHERE julianday('now') - julianday(date_created) <= :days")
-    fun getSongsInLastNDays(days: Int): LiveData<List<Song>>
+    @Query("SELECT AVG(song_rating) FROM song_database WHERE julianday('now') - julianday(date_created) <= :days")
+    suspend fun getAverageRatingLastNDays(days: Int): Double?
 
 }

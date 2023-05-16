@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    viewModel.fetchLastNDaysSongData(dao.getSongsInLastNDays(5))
+                    //viewModel.fetchLastNDaysSongData(dao.getSongsInLastNDays(5))
                     Scaffold(
                         bottomBar = { BottomNavBar(items = listOf(
                                 BottomNavItem(
