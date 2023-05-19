@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.himanshoe.charty.bar.model.BarData
+import java.time.LocalDate
 
 @Dao
 interface SongDao {
@@ -20,13 +22,19 @@ interface SongDao {
     @Query("SELECT * FROM song_database ORDER BY song_id DESC LIMIT 1")
     fun getLastPlayedSong(): LiveData<Song>
 
-    // Select data for charting
-    /*
-    @Query("SELECT * FROM song_database WHERE strftime('%s', 'now') - strftime('%s', song_context) <= :days * 86400")
-    fun getSongsInLastNDays(days: Int): LiveData<List<Song>>
-*/
 
     @Query("SELECT AVG(song_rating) FROM song_database WHERE julianday('now') - julianday(date_created) <= :days")
     suspend fun getAverageRatingLastNDays(days: Int): Double?
+
+    @Query("""
+    SELECT date_created as xValue, AVG(song_rating) as yValue
+    FROM song_database
+    WHERE date_created >= :startDate AND date_created <= :endDate
+    GROUP BY date_created
+    ORDER BY date_created
+""")
+    suspend fun getDailyAverageRatingsForDateRange(startDate: LocalDate, endDate: LocalDate): List<BarData>
+
+
 
 }

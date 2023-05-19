@@ -25,11 +25,13 @@ import com.example.melodymetricscompose.db.Song
 import com.example.melodymetricscompose.db.SongDatabase
 import com.example.melodymetricscompose.mediareaders.MediaBroadcastReceiver
 import com.example.melodymetricscompose.mediareaders.TrackChangedEvent
+import com.example.melodymetricscompose.scrapers.AOYRatingFetcher
 import com.example.melodymetricscompose.scrapers.RYMRatingFetcher
 import com.example.melodymetricscompose.ui.elements.BottomNavBar
 import com.example.melodymetricscompose.ui.elements.BottomNavItem
 import com.example.melodymetricscompose.ui.elements.Navigation
 import com.example.melodymetricscompose.ui.theme.MelodyMetricsComposeTheme
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -71,7 +73,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 32.dp), //TODO paddings a spacers -> Detailne prostudovat, je to ugly rn
+                        .padding(top = 2.dp, start = 4.dp, end = 4.dp, bottom = 2.dp),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
@@ -118,14 +120,17 @@ class MainActivity : ComponentActivity() {
     // TODO lepsi timestamp --> lepsi id at to dava vetsi smysl
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTrackChanged(event: TrackChangedEvent) {
-        val timestamp: Long = System.currentTimeMillis() // Timestamp je Primary Key -> stejny song, jiny cas == 2 database entries
+        val timestamp: Long = System.currentTimeMillis()
         val currentDate = LocalDate.now()
-        Log.d("BROADCAST","ALBUM: ${event.album}, TITLE: ${event.title}")
         lifecycleScope.launch{
-            val scrapedInfo = RYMRatingFetcher.fetchRating(event.artist, event.album)
-            if (scrapedInfo.rating != null){
-                viewModel.insertSong(Song(timestamp, event.title, event.album, scrapedInfo.rating, scrapedInfo.url, currentDate)) //TODO pass RYM link
-                Log.d("FETCHED","Albums ${event.album} rating is: $scrapedInfo.rating")
+            val defferedScrapedInfoRYM = async { RYMRatingFetcher.fetchRating(event.artist, event.album)}
+            //val defferedScrapedInfoAOY = async { AOYRatingFetcher.fetchRating(event.artist, event.album)}
+
+            val scrapedInfoRYM = defferedScrapedInfoRYM.await()
+
+            if (scrapedInfoRYM.rating != null){
+                viewModel.insertSong(Song(timestamp, event.title, event.album, scrapedInfoRYM.rating, scrapedInfoRYM.url, currentDate)) //TODO pass RYM link
+                Log.d("FETCHED","Albums ${event.album} rating is: $scrapedInfoRYM.rating")
             } else {
                 viewModel.insertSong(Song(timestamp, event.title, event.album, null, null, currentDate))
                 Log.d("FETCHED","Album rating NOT FETCHED")

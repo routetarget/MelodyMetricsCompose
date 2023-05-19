@@ -2,14 +2,24 @@ package com.example.melodymetricscompose.ui.elements
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -47,17 +57,22 @@ fun BottomNavBar(
     onItemClick: (BottomNavItem) -> Unit
 ){
     val backStackEntry = navController.currentBackStackEntryAsState()
-    NavigationBar(modifier = modifier, containerColor = Color.DarkGray) {
+    NavigationBar(modifier = modifier, containerColor = MaterialTheme.colorScheme.primaryContainer) {
         items.forEach{item ->
             val selected = item.route == backStackEntry.value?.destination?.route
             NavigationBarItem(selected = item.route == navController.currentDestination?.route, onClick = {onItemClick(item)}, icon = {
-                Icon(imageVector = item.icon, contentDescription = item.name)
-                if(selected){
-                    Text(
-                        text = item.name,
-                        textAlign = TextAlign.Center,
-                        fontSize = 10.sp
-                    )
+                Column (horizontalAlignment = Alignment.CenterHorizontally) {
+
+
+                    Icon(imageVector = item.icon, contentDescription = item.name)
+                    if (selected) {
+
+                        Text(
+                            text = item.name,
+                            textAlign = TextAlign.Center,
+                            fontSize = 10.sp
+                        )
+                    }
                 }
             })
 
@@ -78,8 +93,12 @@ fun Home(name: String, modifier: Modifier = Modifier, viewModel: SongViewModel) 
         ) {
             CurrentlyPlayingCard(viewModel)
         }
-        StatsCard(viewModel)
-        //BarChartCardDynamic(viewModel)
+        Spacer(modifier = Modifier.height(16.dp))
+        StatsCard(viewModel,40)
+        Spacer(modifier = Modifier.height(16.dp))
+        StatsCard(viewModel,1)
+        Spacer(modifier = Modifier.height(16.dp))
+        //BarChartCardDynamic(viewModel = viewModel)
     }
 }
 
@@ -100,8 +119,47 @@ fun HistoryScreen(name: String, modifier: Modifier = Modifier, viewModel: SongVi
 
 @Composable
 fun SettingsScreen(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+    // Create state holders
+    val checkbox1State = remember { mutableStateOf(false) }
+    val checkbox2State = remember { mutableStateOf(false) }
+    val sliderState = remember { mutableStateOf(2f) } // slider range from 2 to 50
+
+    Column(modifier = modifier.padding(16.dp)) {
+        Text(
+            text = "Nastavení",
+            style = typography.headlineMedium,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = checkbox1State.value,
+                onCheckedChange = { checkbox1State.value = it }
+            )
+            Text(text = "RYM", modifier = Modifier.padding(start = 8.dp))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = checkbox2State.value,
+                onCheckedChange = { checkbox2State.value = it }
+            )
+            Text(text = "Metacritic", modifier = Modifier.padding(start = 8.dp))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Historie dní: ${sliderState.value.toInt()}")
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Slider(
+            value = sliderState.value,
+            onValueChange = { sliderState.value = it },
+            valueRange = 2f..50f,
+        )
+    }
 }

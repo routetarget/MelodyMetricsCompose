@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.melodymetricscompose.SongViewModel
 import com.example.melodymetricscompose.db.Song
+import com.himanshoe.charty.bar.BarChart
+import com.himanshoe.charty.bar.model.BarData
 import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.startAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -26,7 +30,7 @@ import kotlin.random.Random
 
 @Composable
 fun BarChartCardDynamic(viewModel: SongViewModel) {
-    //val chartEntryModelProducer = ChartEntryModelProducer(getRandomEntries())
+    val dailyAverageRatingsLast14Days by viewModel.dailyAverageRatingsLast14Days.observeAsState(emptyList())
     androidx.compose.material3.Card(
         modifier = Modifier
             .padding(16.dp)
@@ -49,11 +53,13 @@ fun BarChartCardDynamic(viewModel: SongViewModel) {
                     .height(200.dp)
             ) {
                 val context = LocalContext.current
-                Chart(
-                    chart = columnChart(context),
-                    chartModelProducer = viewModel.chartEntryModelProducer,
-                    startAxis = startAxis(),
-                    bottomAxis = bottomAxis(),
+                BarChart(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    onBarClick = {/* TODO */},
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    barData = dailyAverageRatingsLast14Days
                 )
 
             }

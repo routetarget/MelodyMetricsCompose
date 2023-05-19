@@ -3,6 +3,7 @@ package com.example.melodymetricscompose.ui.elements
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,52 +22,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.melodymetricscompose.SongViewModel
 import com.example.melodymetricscompose.db.Song
 
-/*
-@Composable
-fun SongListItem(song: Song) {
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-    ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Column {
-                    Text(
-                        text = song.songContext,
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = song.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = song.songRating.toString(),
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(horizontal = 16.dp)
-                )
-            }
-        }
-    }
-}
-*/
 @Composable
 fun SongListItem(song: Song) {
     Surface(
@@ -88,18 +48,31 @@ fun SongListItem(song: Song) {
                 ),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Text(
-                    text = song.songContext,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(bottom = 2.dp)
-                )
-                Text(
-                    text = song.title,
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Normal),
-                    modifier = Modifier.padding(bottom = 2.dp)
-                )
+            Box(modifier = Modifier.weight(1f)) {
+                Column {
+                    Text(
+                        text = song.songContext,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(bottom = 2.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = song.title,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Normal),
+                        modifier = Modifier.padding(bottom = 2.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "Played on: ${song.dateCreated}",
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Normal),
+                        modifier = Modifier.padding(bottom = 2.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
             Text(
                 text = song.songRating.toString(),
@@ -112,13 +85,16 @@ fun SongListItem(song: Song) {
     }
 }
 
+
+
 @Composable
 fun SongList(viewModel: SongViewModel){
 
     val songs by viewModel.songs.observeAsState()
+    val reversedSongs = songs?.reversed() ?: emptyList()
 
     LazyColumn(modifier = Modifier.padding(vertical = 2.dp)) {
-        itemsIndexed(songs ?: emptyList()) { _, song ->
+        itemsIndexed(reversedSongs ?: emptyList()) { _, song ->
             SongListItem(song)
         }
     }

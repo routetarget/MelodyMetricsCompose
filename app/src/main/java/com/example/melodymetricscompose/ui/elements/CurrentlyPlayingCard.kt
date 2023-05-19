@@ -4,13 +4,17 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,9 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.melodymetricscompose.SongViewModel
 import com.example.melodymetricscompose.db.Song
+
 
 @Composable
 fun CurrentlyPlayingCard(viewModel: SongViewModel){
@@ -54,13 +60,36 @@ fun Card(song: Song) {
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = song.songContext, style = MaterialTheme.typography.headlineMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = song.title, style = MaterialTheme.typography.headlineSmall)
-            //ClickableChip(text = "Click Me!", onClick = {})
-            song.rymLink?.let { CardButton(url = it) }
-            Spacer(modifier = Modifier.height(16.dp))
+        Row(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = song.songContext, style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = song.title, style = MaterialTheme.typography.headlineSmall)
+                song.rymLink?.let { CardButton(url = it) }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            RatingCard(overallRating = song.songRating, modifier = Modifier.padding(8.dp))
+        }
+    }
+}
+
+
+@Composable
+fun RatingCard(overallRating: Double?, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier
+            .fillMaxHeight(0.65f)
+            .width(100.dp),
+        color = MaterialTheme.colorScheme.secondary,
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = overallRating.toString(),
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

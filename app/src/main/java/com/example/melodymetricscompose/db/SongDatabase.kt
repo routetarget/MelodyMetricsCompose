@@ -14,10 +14,10 @@ abstract class SongDatabase : RoomDatabase(){
 
     abstract fun SongDao():SongDao
 
-    // Singleton database
+    // Singleton
     companion object {
-        @Volatile //Different threads modifying the same memory chunk
-        private var INSTANCE: SongDatabase? = null // Nullable - only Instance or null
+        @Volatile
+        private var INSTANCE: SongDatabase? = null
         fun getInstance(context: Context):SongDatabase{
             synchronized(this){
                 var instance = INSTANCE
