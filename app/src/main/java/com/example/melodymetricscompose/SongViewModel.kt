@@ -1,6 +1,11 @@
 package com.example.melodymetricscompose
 
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +14,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.melodymetricscompose.db.Song
 import com.example.melodymetricscompose.db.SongDao
+import com.example.melodymetricscompose.ui.elements.PreferencesKeys
 import com.example.melodymetricscompose.ui.elements.calculateAverageWeightedRating
 import com.himanshoe.charty.bar.model.BarData
 import com.patrykandpatrick.vico.core.entry.ChartEntry
@@ -16,11 +22,33 @@ import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.time.LocalDate
 
-class SongViewModel(private val dao: SongDao): ViewModel() {
+class SongViewModel(private val dao: SongDao, private val dataStore: DataStore<Preferences>): ViewModel() {
+
+    val sliderState: Flow<Float> = dataStore.data
+        .catch { exception: Throwable ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences: Preferences ->
+            preferences[PreferencesKeys.SLIDER_VALUE_KEY] ?: 2f
+        }
+
+    suspend fun saveSliderValue(value: Float) {
+        dataStore.edit { preferences: MutablePreferences ->
+            preferences[PreferencesKeys.SLIDER_VALUE_KEY] = value
+        }
+    }
 
     val songs = dao.getAllSongs()
     val lastPlayedSong = dao.getLastPlayedSong()

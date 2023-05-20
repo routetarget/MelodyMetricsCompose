@@ -1,5 +1,6 @@
 package com.example.melodymetricscompose.ui.elements
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,8 +18,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,12 +32,15 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.melodymetricscompose.SongViewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun Navigation(navController: NavHostController, viewModel: SongViewModel){
@@ -43,7 +52,7 @@ fun Navigation(navController: NavHostController, viewModel: SongViewModel){
             HistoryScreen(name = "History", viewModel = viewModel)
         }
         composable("settings"){
-            SettingsScreen(name = "SettingsScreen")
+            SettingsScreen(name = "SettingsScreen", viewModel = viewModel)
         }
 
     }
@@ -84,6 +93,8 @@ fun BottomNavBar(
 
 @Composable
 fun Home(name: String, modifier: Modifier = Modifier, viewModel: SongViewModel) {
+    val sliderState by viewModel.sliderState.collectAsState(0f)
+    Log.d("Stats","Slider value is ${sliderState.toInt()}")
     Column {
         Box(
             modifier = Modifier
@@ -94,7 +105,7 @@ fun Home(name: String, modifier: Modifier = Modifier, viewModel: SongViewModel) 
             CurrentlyPlayingCard(viewModel)
         }
         Spacer(modifier = Modifier.height(16.dp))
-        StatsCard(viewModel,40)
+        StatsCard(viewModel,sliderState.toInt())
         Spacer(modifier = Modifier.height(16.dp))
         StatsCard(viewModel,1)
         Spacer(modifier = Modifier.height(16.dp))
@@ -118,11 +129,13 @@ fun HistoryScreen(name: String, modifier: Modifier = Modifier, viewModel: SongVi
 
 
 @Composable
-fun SettingsScreen(name: String, modifier: Modifier = Modifier) {
+fun SettingsScreen(name: String, modifier: Modifier = Modifier, viewModel: SongViewModel) {
     // Create state holders
     val checkbox1State = remember { mutableStateOf(false) }
     val checkbox2State = remember { mutableStateOf(false) }
-    val sliderState = remember { mutableStateOf(2f) } // slider range from 2 to 50
+    val sliderState by viewModel.sliderState.collectAsState(0f)
+
+    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = modifier.padding(16.dp)) {
         Text(
@@ -150,16 +163,26 @@ fun SettingsScreen(name: String, modifier: Modifier = Modifier) {
             Text(text = "Metacritic", modifier = Modifier.padding(start = 8.dp))
         }
 
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Historie dní: ${sliderState.value.toInt()}")
+
+        Text(text = "Historie dní: ${sliderState.toInt()}")
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Slider(
-            value = sliderState.value,
-            onValueChange = { sliderState.value = it },
+            value = sliderState,
+            onValueChange = { newValue ->
+                coroutineScope.launch {
+                    viewModel.saveSliderValue(newValue)
+                }
+            },
             valueRange = 2f..50f,
         )
     }
 }
+object PreferencesKeys {
+    val SLIDER_VALUE_KEY = floatPreferencesKey("slider_value")
+}
+

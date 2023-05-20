@@ -35,9 +35,13 @@ import kotlin.math.round
 @Composable
 fun StatsCard(viewModel: SongViewModel, numberOfDays: Int) {
     val averageRating = remember { mutableStateOf<Double?>(null) }
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = numberOfDays) {
         val rawAverageRating = viewModel.getAverageRatingLastNDays(numberOfDays)
-        averageRating.value = round(rawAverageRating!! * 100) / 100
+        averageRating.value =
+            (if (rawAverageRating != null) {
+                round(rawAverageRating * 100) / 100
+            } else 0.0)
+        Log.d("Stats", "number of days passed: $numberOfDays")
         Log.d("Stats","Average rating over last days is: $averageRating")
     }
 

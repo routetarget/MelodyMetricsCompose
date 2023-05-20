@@ -1,6 +1,7 @@
 package com.example.melodymetricscompose
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +19,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
@@ -37,11 +40,13 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.time.LocalDate
+import androidx.datastore.preferences.preferencesDataStore
 
 class MainActivity : ComponentActivity() {
 
     private val mediaReceiver = MediaBroadcastReceiver()
     private lateinit var viewModel: SongViewModel
+    val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -51,7 +56,7 @@ class MainActivity : ComponentActivity() {
 
 
         val dao = SongDatabase.getInstance(application).SongDao()
-        val factory = SongViewModelFactory(dao)
+        val factory = SongViewModelFactory(dao, applicationContext.dataStore)
         viewModel = ViewModelProvider(this,factory).get(SongViewModel::class.java)
         //val lastPlayedSong: Song? by viewModel.lastPlayedSong.observeAsState(initial = null)
 
