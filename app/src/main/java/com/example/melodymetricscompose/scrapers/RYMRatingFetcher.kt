@@ -15,7 +15,6 @@ class RYMRatingFetcher {
 
         suspend fun fetchRating(artistName: String, albumName: String): scrapedInfo = withContext(
             Dispatchers.IO){
-            // Step 1: Perform a search for the album on RYM
             val searchUrl = "$RYM_SEARCH_URL?searchterm=${artistName + " " + albumName.replace(" ", "+")}"
             val searchResults = Jsoup.connect(searchUrl).get().select(".infobox tr")
 
@@ -34,10 +33,8 @@ class RYMRatingFetcher {
 
             delay((random().nextUp().toInt() + 1)/1000L)
 
-            // Step 3: Navigate to the album's page and extract the rating
             val albumDoc = Jsoup.connect(albumUrl).get()
             val ratingText = albumDoc.select(RYM_RATING_SELECTOR).firstOrNull()?.text()
-            //return@withContext ratingText?.toDoubleOrNull()
             return@withContext scrapedInfo(albumUrl, ratingText?.toDoubleOrNull())
 
         }

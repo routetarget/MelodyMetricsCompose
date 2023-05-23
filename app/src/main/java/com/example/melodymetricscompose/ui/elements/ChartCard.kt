@@ -67,7 +67,6 @@ fun BarChartCardDynamic(viewModel: SongViewModel) {
     }
 }
 
-//fun getRandomEntries() = List(4) { FloatEntry(it.toFloat(), (0f..16f).random()) }
 fun getRandomEntries() = List(4) { FloatEntry(it.toFloat(), Random.nextFloat() * 16) }
 
 // TODO move this function somewhere more appropriate

@@ -3,8 +3,10 @@ package com.example.melodymetricscompose
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,60 +57,63 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
-        val dao = SongDatabase.getInstance(application).SongDao()
-        val factory = SongViewModelFactory(dao, applicationContext.dataStore)
-        viewModel = ViewModelProvider(this,factory).get(SongViewModel::class.java)
-        //val lastPlayedSong: Song? by viewModel.lastPlayedSong.observeAsState(initial = null)
 
-        // TODO predelat do peknych objectku at to neni takto shit
-        // TODO Dalsi intenty pro YT Music a Amazon music
-        val DefaultFilter = IntentFilter("com.android.music.metachanged")
-        val SpotifyFilter = IntentFilter("com.spotify.music.metadatachanged")
+            val dao = SongDatabase.getInstance(application).SongDao()
+            val factory = SongViewModelFactory(dao, applicationContext.dataStore)
+            viewModel = ViewModelProvider(this, factory).get(SongViewModel::class.java)
+
+            // TODO predelat do peknych objectku at to neni takto shit
+            // TODO Dalsi intenty pro YT Music a Amazon music
+            val DefaultFilter = IntentFilter("com.android.music.metachanged")
+            val SpotifyFilter = IntentFilter("com.spotify.music.metadatachanged")
 
 
-        registerReceiver(mediaReceiver, DefaultFilter)
-        registerReceiver(mediaReceiver, SpotifyFilter)
+            registerReceiver(mediaReceiver, DefaultFilter)
+            registerReceiver(mediaReceiver, SpotifyFilter)
 
-        // Subscribe to TrackChangedEvent on the event Bus
-        EventBus.getDefault().register(this)
+            // Subscribe to TrackChangedEvent on the event Bus
+            EventBus.getDefault().register(this)
 
-        setContent {
-            MelodyMetricsComposeTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 2.dp, start = 4.dp, end = 4.dp, bottom = 2.dp),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val navController = rememberNavController()
-                    //viewModel.fetchLastNDaysSongData(dao.getSongsInLastNDays(5))
-                    Scaffold(
-                        bottomBar = { BottomNavBar(items = listOf(
-                                BottomNavItem(
-                                    name = "Home",
-                                    route = "mainScreen",
-                                    icon = Icons.Default.Home
-                                ),
-                                BottomNavItem(
-                                    name = "History",
-                                    route = "history",
-                                    icon = Icons.Default.List
-                                ),
-                                BottomNavItem(
-                                    name = "Settings",
-                                    route = "settings",
-                                    icon = Icons.Default.Settings
-                                ),
-                            ), navController = navController, 
-                            onItemClick = {navController.navigate(it.route)})}
+            setContent {
+                MelodyMetricsComposeTheme {
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 2.dp, start = 4.dp, end = 4.dp, bottom = 2.dp),
+                        color = MaterialTheme.colorScheme.background
                     ) {
-                        Navigation(navController = navController, viewModel = viewModel)
-                    }
+                        val navController = rememberNavController()
+                        //viewModel.fetchLastNDaysSongData(dao.getSongsInLastNDays(5))
+                        Scaffold(
+                            bottomBar = {
+                                BottomNavBar(items = listOf(
+                                    BottomNavItem(
+                                        name = "Home",
+                                        route = "mainScreen",
+                                        icon = Icons.Default.Home
+                                    ),
+                                    BottomNavItem(
+                                        name = "History",
+                                        route = "history",
+                                        icon = Icons.Default.List
+                                    ),
+                                    BottomNavItem(
+                                        name = "Settings",
+                                        route = "settings",
+                                        icon = Icons.Default.Settings
+                                    ),
+                                ), navController = navController,
+                                    onItemClick = { navController.navigate(it.route) })
+                            }
+                        ) {
+                            Navigation(navController = navController, viewModel = viewModel)
+                        }
 
+                    }
                 }
             }
-        }
+
     }
 
     override fun onDestroy() {
@@ -118,11 +123,6 @@ class MainActivity : ComponentActivity() {
 
     }
 
-// TODO track nekolikrat za sebou
-    // TODO Every time main activity is restarted, scraper runs again -- check that
-    // TODO app is fetched every time on start
-    // TODO nekolik tracku za sebou
-    // TODO lepsi timestamp --> lepsi id at to dava vetsi smysl
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTrackChanged(event: TrackChangedEvent) {
         val timestamp: Long = System.currentTimeMillis()
@@ -142,6 +142,9 @@ class MainActivity : ComponentActivity() {
             }
 
         }
+    }
+    companion object {
+        private val MIN_SUPPORTED_VERSION = Build.VERSION_CODES.Q // Minimum supported version (Android 5.0 - API level 21)
     }
 
 }

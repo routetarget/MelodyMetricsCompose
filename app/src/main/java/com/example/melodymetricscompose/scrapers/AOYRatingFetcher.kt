@@ -14,7 +14,6 @@ class AOYRatingFetcher {
 
             suspend fun fetchRating(artistName: String, albumName: String): scrapedInfo = withContext(
                 Dispatchers.IO){
-                // Step 1: Perform a search for the album on RYM
                 val searchUrl = "$SEARCH_URL/?q=${artistName + " " + albumName.replace(" ", "+")}"
                 val searchResults = Jsoup.connect(searchUrl).get().select(".infobox tr")
 
@@ -33,7 +32,6 @@ class AOYRatingFetcher {
 
                 delay((StrictMath.random().nextUp().toInt() + 1)/1000L)
 
-                // Step 3: Navigate to the album's page and extract the rating
                 val albumDoc = Jsoup.connect(albumUrl).get()
                 val ratingText = albumDoc.select(RATING_SELECTOR).firstOrNull()?.text()
                 //return@withContext ratingText?.toDoubleOrNull()
